@@ -37,7 +37,10 @@ parent_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
 # make this dir if doesn't exist. 
 # This will be used in our aws-cli docker container's .aws dir using docker volumes, as recommended in aws instructions https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-docker.html
 mkdir -p $parent_path/.aws
+
+# results in something like: docker run --rm -it -v /home/vagrant/projects/terraform-dev-env/.aws:/root/.aws amazon/aws-cli
 aws_cli="docker run --rm -it -v $parent_path/.aws:/root/.aws amazon/aws-cli"
+
 
 # get thedocker image for aws cli. Use docker, so can run this on windows or linux or anything that runs docker
 # https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-docker.html
@@ -79,6 +82,9 @@ $terraform validate
 $terraform apply \
   -var="aws_region=$aws_region" \
   -var="aws_instance_type=$aws_instance_type" && \
-$terraform show
-#$terraform output output.tf
 
+$terraform show && \
+
+# TODO this won't be windows doable: 
+sudo apt install -y jq && \
+$terraform output -json | jq '.id.value[0]'

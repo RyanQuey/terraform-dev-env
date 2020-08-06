@@ -19,7 +19,7 @@ provider "aws" {
 # TODO set name dynamically
 resource "aws_cloud9_environment_ec2" "dev_env" {
   instance_type = var.aws_instance_type
-  name          = "ubuntu-dev-env"
+  name          = "dev-env-${var.aws_instance_type}-from-terraform"
   # TODO actually currently is aws linux, and cannot change I don't think
   description = "cloud9 dev env using aws linux, with 16GB Ram and 4 cores"
   tags = {
@@ -44,3 +44,9 @@ resource "aws_cloud9_environment_ec2" "dev_env" {
   # }
 
 }
+
+output "id" {
+  description = "List of IDs of instances"
+  value       = aws_cloud9_environment_ec2.dev_env.*.id
+}
+
