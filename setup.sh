@@ -9,20 +9,21 @@ fi
 # SETUP this file
 #####################################
 # Instructions
-# 1) set region you want here:
+# 1) set region and other AWS settings you want here:
 # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html#concepts-available-regions
 # or run this (after aws_cli is defined): $aws_cli ec2 describe-availability-zones --all-availability-zones
-#aws_region=us-west-2
-aws_region=us-east-1
+aws_region=us-west-2
+#aws_region=us-east-1
 #aws_region=us-west-2-lax-1a # DOESN'T WORK
+
+# If I wanted something small, I'd save the time and money and just run the vm on my laptop!
+# cloud9 doesn't require (or allow for that matter) different AMIs, just set the instance type and you're on your way
+aws_instance_type=t3.xlarge
 
 # 2) then get your secret key ready!
 # https://console.aws.amazon.com/iam/home?region=us-west-2#/security_credentials
 # 3) run this script
 
-
-# TODOs for this project:
-# - use ansible for this instead of bash script?
 
 #####################################
 
@@ -75,7 +76,9 @@ $terraform fmt && \
 $terraform validate
 
 # should be ready, let's run it
-# NOTE Setting the AMI seems to set the region for us. So might be easier to just set ami. UNLESS we want to use aws cli to find amis for a given region or something
-$terraform apply -var="aws_region=$aws_region" && \
+$terraform apply \
+  -var="aws_region=$aws_region" \
+  -var="aws_instance_type=$aws_instance_type" && \
 $terraform show
+#$terraform output output.tf
 
