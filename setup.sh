@@ -5,10 +5,26 @@ if [ "$BASH" != "/bin/bash" ]; then
   exit 1
 fi
 
-# TODOs
+#####################################
+# SETUP this file
+#####################################
+# Instructions
+# 1) set region you want here:
+# https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html#concepts-available-regions
+# or run this (after aws_cli is defined): $aws_cli ec2 describe-availability-zones --all-availability-zones
+#aws_region=us-west-2
+aws_region=us-east-1
+#aws_region=us-west-2-lax-1a # DOESN'T WORK
+
+# 2) then get your secret key ready!
+# https://console.aws.amazon.com/iam/home?region=us-west-2#/security_credentials
+# 3) run this script
+
+
+# TODOs for this project:
 # - use ansible for this instead of bash script?
 
-
+#####################################
 
 # always base everything relative to this file to make it simple
 parent_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
@@ -33,7 +49,7 @@ aws_cli="docker run --rm -it -v $parent_path/.aws:/root/.aws amazon/aws-cli"
 # technically, can skip this since we have the config set in git. 
 # But, for now we want to .gitignore that. So if running the first time UNCOMMENT THESE
 # Also, if we change a var in this file, want that to be reflected in the aws cli profile too
-# $aws_cli configure set profile.setup-cloud9.region us-west-2
+$aws_cli configure set profile.setup-cloud9.region $aws_region
 # $aws_cli configure set profile.setup-cloud9.output json
 
 # allow user to put in their credentials
@@ -54,8 +70,12 @@ terraform="docker run -it -v $parent_path:/workspace -w /workspace hashicorp/ter
 # verify installation
 # TODO set a version? e.g., docker pull hashicorp/terraform:0.12.29
 # NOTE don't need to call `terraform` command. E.g., don't do `terraform init`, just do `init`
-$terraform init
-$terraform fmt
+$terraform init && \
+$terraform fmt && \
 $terraform validate
 
-$terraform plan aws-cloud9.tf
+# should be ready, let's run it
+# NOTE Setting the AMI seems to set the region for us. So might be easier to just set ami. UNLESS we want to use aws cli to find amis for a given region or something
+$terraform apply -var="aws_region=$aws_region" && \
+$terraform show
+

@@ -1,6 +1,12 @@
+variable "aws_region" {
+  type        = string
+  description = "region for aws ec2 instance"
+}
+
 provider "aws" {
-  profile = "default"
-  region  = "us-east-1"
+  profile                 = "setup-cloud9"
+  shared_credentials_file = "/workspace/.aws/credentials"
+  region                  = var.aws_region
 }
 
 resource "aws_instance" "example" {
